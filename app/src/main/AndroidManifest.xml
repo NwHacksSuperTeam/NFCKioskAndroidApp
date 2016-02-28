@@ -1,37 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nwhacks.superteam.nfckiosk">
+<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android"
+package="com.nwhacks.superteam.nfckiosk">
 
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-sdk android:minSdkVersion="10"/>
+<uses-permission android:name="android.permission.NFC" />
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+<uses-sdk android:minSdkVersion="10" />
 
-    <uses-feature android:name="android.hardware.nfc" android:required="true" />
+<uses-feature android:name="android.hardware.nfc" android:required="true" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+<application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name"
+    android:supportsRtl="true" android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    <activity android:name=".MainActivity" android:label="@string/app_name" android:theme="@style/AppTheme.NoActionBar">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
 
-        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+    <activity android:label="@string/event_verify" android:name=".VerifyMifareActivity">
+        <intent-filter>
+            <action android:name="android.nfc.action.TECH_DISCOVERED" />
+        </intent-filter>
+        <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
+            android:resource="@xml/filter_nfc" />
+    </activity>
+
+
+    <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
              App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-    </application>
+    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+</application>
 
 </manifest>
