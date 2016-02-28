@@ -7,8 +7,11 @@ package com.nwhacks.superteam.nfckiosk;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.ParcelUuid;
+import android.util.Log;
 
- import java.io.IOException;
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class ConnectThread extends Thread {
@@ -21,10 +24,26 @@ public class ConnectThread extends Thread {
         BluetoothSocket tmp = null;
         mmDevice = device;
 
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+
+        try {
+            Method getUuidsMethod = BluetoothAdapter.class.getDeclaredMethod("getUuids", null);
+
+
+            ParcelUuid[] uuids = (ParcelUuid[]) getUuidsMethod.invoke(adapter, null);
+
+            for (ParcelUuid uuid : uuids) {
+                Log.d("UUID: ", uuid.getUuid().toString());
+            }
+        }
+        catch(Exception e){}
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
             // MY_UUID is the app's UUID string, also used by the server code
-            UUID uuid = UUID.fromString(""); //TODO: replace placeholder UUID
+            boolean b = mmDevice.fetchUuidsWithSdp();
+            b = b || false;
+            ParcelUuid[] pu = mmDevice.getUuids();
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
             tmp = device.createRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) { }
         mmSocket = tmp;

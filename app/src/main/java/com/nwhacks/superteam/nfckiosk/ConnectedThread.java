@@ -32,16 +32,16 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[1024];  // buffer store for the stream
+        byte[] buffer = new byte[(int)Math.pow(2,11)];  // buffer store for the stream
         int bytes; // bytes returned from read()
 
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
                 // Read from the InputStream
-                bytes = mmInStream.read(buffer);
+                mmInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
-                Log.d("BLUETOOTH INPUT", "" + bytes);
+                Log.d("BLUETOOTH INPUT", "" + new String(buffer, "UTF-8"));
             } catch (IOException e) {
                 break;
             }
