@@ -7,6 +7,8 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,15 +40,21 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[100];  // buffer store for the stream
+        byte[] buffer = new byte[30000];  // buffer store for the stream
         int bytes;
 
         Bitmap bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
-        BufferedInputStream buf = new BufferedInputStream(mmInStream, 8096);
+        BufferedInputStream buf = new BufferedInputStream(mmInStream, 20000);
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
         while (true){
             try {
                 buffer = new byte[buf.available()];
                 buf.read(buffer);
+//                int len = 0;
+//                while ((len = buf.read(buffer)) != -1) {
+//                    byteBuffer.write(buffer, 0, len);
+//                }
 
                 bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
                 String s = new String(buffer, 0, 10);
@@ -60,6 +68,12 @@ public class ConnectedThread extends Thread {
 
         Bitmap bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
         BufferedInputStream buf = new BufferedInputStream(mmInStream, 8096);
+=======
+        ArrayList<byte[]> buffers2 = new ArrayList<byte[]>();
+
+        Bitmap bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+        BufferedInputStream buf = new BufferedInputStream(mmInStream, 8096);
+>>>>>>> 89ea2edde4d39993d1793d6054fc6bc77bf7a023
         // Keep listening to the InputStream until an exception occurs
         while(true) {
             try {
@@ -95,6 +109,7 @@ public class ConnectedThread extends Thread {
         bmp = BitmapFactory.decodeByteArray(hyperbuffer, 0, hyperbuffer.length);
         bmp.toString();
     */
+
     }
 
     /* Call this from the main activity to send data to the remote device */
