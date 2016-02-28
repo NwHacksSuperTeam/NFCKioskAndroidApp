@@ -107,14 +107,19 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothAdapter.startDiscovery();
 
 
+
+        /*
+        PREPARE YOUR BUTT CUZ THIS NEXT CODE IS MINE (Jeff)
+         */
+
         //Checking for NFC compatability
         if (!mNfcAdapter.isEnabled()) {
             //Shit is good
-            Log.d("Good","Good");
+            Log.d("NFC Reader Doesnt Work"," :( ");
 
         } else {
             //print("NFC is working on this device.");
-            Log.d("Bad","Sad");
+            Log.d("NFC Reader is Working"," :):):) ");
         }
 
         pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
@@ -124,6 +129,9 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         IntentFilter filter2     = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
         readTagFilters = new IntentFilter[]{tagDetected,filter2};
+        /*
+        NO LONGER MY CODE (JEFF)
+         */
 
     }
 
@@ -170,7 +178,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /*
+    JEFF IS BACK AT IT
 
+    This function essentially just processes the NFC intent. Its only called by onNewIntent()
+     */
     public void readFromTag(Intent intent){
 
         Ndef ndef = Ndef.get(detectedTag);
@@ -201,7 +213,9 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Cannot Read From Tag.", Toast.LENGTH_LONG).show();
         }
     }
-
+    /*
+    No longer my code
+     */
 
 
 
