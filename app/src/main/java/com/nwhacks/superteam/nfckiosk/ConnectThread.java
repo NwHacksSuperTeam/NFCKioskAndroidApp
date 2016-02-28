@@ -44,7 +44,7 @@ public class ConnectThread extends Thread {
             b = b || false;
             ParcelUuid[] pu = mmDevice.getUuids();
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-            tmp = device.createRfcommSocketToServiceRecord(uuid);
+            tmp = device.createInsecureRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) { }
         mmSocket = tmp;
     }

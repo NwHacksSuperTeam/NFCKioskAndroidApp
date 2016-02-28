@@ -36,9 +36,8 @@ public class ConnectedThread extends Thread {
         byte[] buffer = new byte[100];  // buffer store for the stream
         int bytes; // bytes returned from read()
 
-        Scanner scan = new Scanner(mmInStream);
         // Keep listening to the InputStream until an exception occurs
-        for(int i =0;i<100;i++) {
+        for(int i =0;i<10;i++) {
             try {
                 // Read from the InputStream
                 mmInStream.read(buffer);
@@ -49,6 +48,8 @@ public class ConnectedThread extends Thread {
                 break;
             }
         }
+        try {mmInStream.close();}
+        catch (Exception e) {}
     }
 
     /* Call this from the main activity to send data to the remote device */
