@@ -11,7 +11,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.nwhacks.superteam.nfckiosk.MainActivity"
     tools:showIn="@layout/activity_main"
-    android:id="@+id/">
+    android:id="@+id/Default">
 
     <TextView
         android:layout_width="wrap_content"
@@ -20,7 +20,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="99dp"
-        android:id="@+id/" />
+        android:id="@+id/TextOutput" />
 
     <Button
         android:layout_width="wrap_content"

@@ -24,9 +24,9 @@ import android.view.MenuItem;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.IntentFilter.MalformedMimeTypeException;
+import android.widget.TextView;
 
 import com.nwhacks.superteam.nfckiosk.NFC.NdefReaderTask;
-import com.nwhacks.superteam.nfckiosk.NFC.nfcHandler;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,13 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
     //NFC Adaptor
     private NfcAdapter mNfcAdapter;
+    private TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-
+        mTextView = (TextView) findViewById(R.id.TextOutput);
 
         intent = new Intent(this, MainActivity.class);
         msgs = new NdefMessage[]{}; //initialize message array to be empty
@@ -85,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Checking for NFC compatability
         if (!mNfcAdapter.isEnabled()) {
-
+            //Shit is good
         } else {
-            print("NFC is working on this device.");
+            //print("NFC is working on this device.");
         }
 
         handleIntent(getIntent());
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         filters[0].addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
         filters[0].addCategory(Intent.CATEGORY_DEFAULT);
         try {
-            filters[0].addDataType(MIME_TEXT_PLAIN);
+            filters[0].addDataType("MIME_TEXT_PLAIN");
         } catch (MalformedMimeTypeException e) {
             throw new RuntimeException("Check your mime type.");
         }
@@ -172,12 +173,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.disableForegroundDispatch(activity);
     }
 
-    /*
-    Function listens for new NFC event.
-    Contacts the nfcHandler and lets it deal with it.
-     */
-
-    private com.nwhacks.superteam.nfckiosk.NFC.nfcHandler nfcHandler;
 
 
     /*
@@ -198,13 +193,13 @@ public class MainActivity extends AppCompatActivity {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
 
             String type = intent.getType();
-            if (MIME_TEXT_PLAIN.equals(type)) {
+            if ("MIME_TEXT_PLAIN".equals(type)) {
 
                 Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 new NdefReaderTask().execute(tag);
 
             } else {
-                Log.d(TAG, "Wrong mime type: " + type);
+                Log.d("TAG", "Wrong mime type: " + type);
             }
         } else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)) {
 
