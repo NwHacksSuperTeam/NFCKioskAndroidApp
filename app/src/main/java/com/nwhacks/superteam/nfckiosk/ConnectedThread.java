@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Scanner;
 
 /**
  * Created by theal on 2/27/2016.
@@ -32,17 +33,19 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[(int)Math.pow(2,11)];  // buffer store for the stream
+        byte[] buffer = new byte[100];  // buffer store for the stream
         int bytes; // bytes returned from read()
 
+        Scanner scan = new Scanner(mmInStream);
         // Keep listening to the InputStream until an exception occurs
-        while (true) {
+        for(int i =0;i<100;i++) {
             try {
                 // Read from the InputStream
                 mmInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
-                Log.d("BLUETOOTH INPUT", "" + new String(buffer, "UTF-8"));
-            } catch (IOException e) {
+                sleep(100);
+                Log.d("BLUETOOTH INPUT", "" + new String(buffer));
+            } catch (Exception e) {
                 break;
             }
         }
