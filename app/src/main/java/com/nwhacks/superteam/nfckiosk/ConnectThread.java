@@ -18,7 +18,7 @@ public class ConnectThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
 
-    public ConnectThread(BluetoothDevice device) {
+    public ConnectThread(BluetoothDevice device, String uuidString) {
         // Use a temporary object that is later assigned to mmSocket,
         // because mmSocket is final
         BluetoothSocket tmp = null;
@@ -43,7 +43,7 @@ public class ConnectThread extends Thread {
             boolean b = mmDevice.fetchUuidsWithSdp();
             b = b || false;
             ParcelUuid[] pu = mmDevice.getUuids();
-            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+            UUID uuid = UUID.fromString(uuidString);
             tmp = device.createRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) { }
         mmSocket = tmp;

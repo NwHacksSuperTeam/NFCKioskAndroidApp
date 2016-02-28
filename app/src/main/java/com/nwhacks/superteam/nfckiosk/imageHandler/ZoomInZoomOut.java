@@ -47,7 +47,7 @@ public class ZoomInZoomOut extends Activity implements OnTouchListener
     // these PointF objects are used to record the point(s) the user is touching
     PointF start = new PointF();
     PointF mid = new PointF();
-    float oldDist = 1f;
+    double oldDist = 1f;
 
     /** Called when the activity is first created. */
     @Override
@@ -64,7 +64,7 @@ public class ZoomInZoomOut extends Activity implements OnTouchListener
     {
         ImageView view = (ImageView) v;
         view.setScaleType(ImageView.ScaleType.MATRIX);
-        float scale;
+        double scale;
 
         // Handle touch events here...
 
@@ -107,7 +107,7 @@ public class ZoomInZoomOut extends Activity implements OnTouchListener
                 else if (mode == ZOOM)
                 {
                     // pinch zooming
-                    float newDist = spacing(event);
+                    double newDist = spacing(event);
                     Log.d(TAG, "newDist=" + newDist);
                     if (newDist > 5f)
                     {
@@ -116,7 +116,7 @@ public class ZoomInZoomOut extends Activity implements OnTouchListener
                         // matrix...if scale > 1 means
                         // zoom in...if scale < 1 means
                         // zoom out
-                        matrix.postScale(scale, scale, mid.x, mid.y);
+                        matrix.postScale((float)scale, (float)scale, mid.x, mid.y);
                     }
                 }
                 break;
@@ -134,11 +134,13 @@ public class ZoomInZoomOut extends Activity implements OnTouchListener
      * ----------------------------------------------------
      */
 
-    private float spacing(MotionEvent event)
+    private double spacing(MotionEvent event)
     {
-        float x = event.getX(0) - event.getX(1);
-        float y = event.getY(0) - event.getY(1);
-        return FloatMath.sqrt(x * x + y * y);
+        double x = event.getX(0) - event.getX(1);
+        double y = event.getY(0) - event.getY(1);
+        double sqsm = x*x+y*y;
+        //return FloatMath.sqrt(x * x + y * y);
+        return Math.sqrt(sqsm);
     }
 
     /*

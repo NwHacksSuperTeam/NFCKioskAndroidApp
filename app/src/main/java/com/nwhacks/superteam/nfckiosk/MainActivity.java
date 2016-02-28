@@ -90,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        Intent thisIntent = getIntent();
+        final String thisUUID = thisIntent.getStringExtra("uuid");
         // Create a BroadcastReceiver for ACTION_FOUND
         BroadcastReceiver mReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                         String s = device.getName();
                         Log.d("BLUE TEETH", device.getName() + " " + device.getAddress());
                         if(device.getAddress().equals("30:14:11:14:02:68")){
-                            ConnectThread connectThread = new ConnectThread(device);
+                            ConnectThread connectThread = new ConnectThread(device, thisUUID);
                             connectThread.start();
                         }
                     }catch (Exception e){
