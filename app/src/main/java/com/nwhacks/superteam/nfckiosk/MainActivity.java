@@ -29,8 +29,6 @@ import android.nfc.NdefRecord;
 import android.app.PendingIntent;
 import android.widget.TextView;
 
-import java.util.Set;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -97,37 +95,17 @@ public class MainActivity extends AppCompatActivity {
                             connectThread.start();
                         }
                     }catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
             }
         };
         // Register the BroadcastReceiver
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        boolean shouldDiscover = true;
-
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        // If there are paired devices
-        if (pairedDevices.size() > 0) {
-            // Loop through paired devices
-            for (BluetoothDevice device : pairedDevices) {
-                if(device.getAddress().equals("30:14:11:14:02:68")) {
-                    shouldDiscover = false;
-                    break;
-                }
-            }
-        }
-        if(shouldDiscover) {
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
-            mBluetoothAdapter.startDiscovery();
-        }
-        else {
-            BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("30:14:11:14:02:68");
-            ConnectThread connectThread = new ConnectThread(device);
-            connectThread.start();
-
-        }
+        mBluetoothAdapter.startDiscovery();
 
 
         //Checking for NFC compatability

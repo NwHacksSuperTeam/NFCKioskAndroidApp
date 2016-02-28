@@ -10,6 +10,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -38,40 +39,72 @@ public class ConnectedThread extends Thread {
 
     public void run() {
         byte[] buffer = new byte[100];  // buffer store for the stream
-        int bytes; // bytes returned from read()
+        int bytes;
 
-        Bitmap bmp =  BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+        Bitmap bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
         BufferedInputStream buf = new BufferedInputStream(mmInStream, 8096);
+        while (true){
+            try {
+                buffer = new byte[buf.available()];
+                buf.read(buffer);
 
+                bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+                String s = new String(buffer, 0, 10);
+                Log.d("BLUETOOTH INPUT", "" + s);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        /*
+        ArrayList<byte[]> buffers2 = new ArrayList<byte[]>();
+
+        Bitmap bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+        BufferedInputStream buf = new BufferedInputStream(mmInStream, 8096);
         // Keep listening to the InputStream until an exception occurs
-        while (!(bmp != null)){
-            for (int i = 0; i < 1; i++) {
-                try {
-                    String request = "sendmeimage";
-                    byte[] requestBuffer = request.getBytes("UTF-8");
-                    //write(requestBuffer);
-
-                    buffer = new byte[buf.available()];
-                    buf.read(buffer);
-
-                    bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
-                    String s = new String(buffer, 0, 40);
-                    Log.d("BLUETOOTH INPUT", "" + s);
-                } catch (Exception e) {
+        while(true) {
+            try {
+                if(buf.available() == 0){
                     break;
                 }
+                buffer = new byte[buf.available()];
+                buf.read(buffer);
+                buffers2.add(buffer);
+
+            } catch (Exception e) {
+                break;
             }
         }
         try {mmInStream.close();}
         catch (Exception e) {}
+
+        byte[] hyperbuffer = {};
+
+        for(byte[] bufferpiece : buffers2){
+            byte[] nextHyperbuffer = new byte[hyperbuffer.length + bufferpiece.length];
+            System.arraycopy(
+                    hyperbuffer, 0,
+                    nextHyperbuffer, 0,
+                    hyperbuffer.length);
+            System.arraycopy(
+                    bufferpiece, 0,
+                    nextHyperbuffer, hyperbuffer.length,
+                    bufferpiece.length);
+            hyperbuffer = nextHyperbuffer;
+        }
+
+        bmp = BitmapFactory.decodeByteArray(hyperbuffer, 0, hyperbuffer.length);
+        bmp.toString();
+    */
     }
 
     /* Call this from the main activity to send data to the remote device */
     public void write(byte[] bytes) {
         try {
-            for(int i = 0; i < 1000; i++)
+            for(int i = 0; i < 1; i++)
                 mmOutStream.write(bytes);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /* Call this from the main activity to shutdown the connection */
