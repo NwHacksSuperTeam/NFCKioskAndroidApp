@@ -6,11 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,9 +20,14 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
+import android.os.Parcelable;
+import android.widget.Toast;
+
+import android.nfc.NdefRecord;
+
+
+import android.app.PendingIntent;
+import android.widget.TextView;
 
 import java.util.Set;
 
@@ -30,10 +35,31 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
 
     Intent intent;
+
+    IntentFilter[] readTagFilters;
+    PendingIntent pendingIntent;
+    Tag detectedTag;
+
     NdefMessage[] msgs;
+
+    //NFC Adaptor
+    private NfcAdapter mNfcAdapter;
+
+
+
+    private TextView mTextView;
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        mTextView = (TextView) findViewById(R.id.TextOutput);
 
 
         intent = new Intent(this, MainActivity.class);
@@ -103,6 +129,36 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+
+        //Checking for NFC compatability
+        if (!mNfcAdapter.isEnabled()) {
+            //Shit is good
+            Log.d("Good","Good");
+
+        } else {
+            //print("NFC is working on this device.");
+            Log.d("Bad","Sad");
+        }
+
+        pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                new Intent(this,getClass()).
+                        addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+        IntentFilter filter2     = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        readTagFilters = new IntentFilter[]{tagDetected,filter2};
+
+    }
+
+    protected void onNewIntent(Intent intent) {
+
+        setIntent(intent);
+
+        if(getIntent().getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)){
+            detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+            readFromTag(getIntent());
+        }
     }
 
     @Override
@@ -131,19 +187,45 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
+        mNfcAdapter.enableForegroundDispatch(this, pendingIntent, readTagFilters, null);
 
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
 
 
+    public void readFromTag(Intent intent){
+
+        Ndef ndef = Ndef.get(detectedTag);
+
+
+        try{
+            ndef.connect();
+
+            Parcelable[] messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+
+            if (messages != null) {
+                NdefMessage[] ndefMessages = new NdefMessage[messages.length];
+                for (int i = 0; i < messages.length; i++) {
+                    ndefMessages[i] = (NdefMessage) messages[i];
+                }
+                NdefRecord record = ndefMessages[0].getRecords()[0];
+
+                byte[] payload = record.getPayload();
+                String text = new String(payload);
+                mTextView.setText(text);
+
+
+                ndef.close();
+
+            }
+        }
+        catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Cannot Read From Tag.", Toast.LENGTH_LONG).show();
+        }
     }
+
+
+
+
 }
