@@ -29,6 +29,20 @@ import android.nfc.NdefRecord;
 import android.app.PendingIntent;
 import android.widget.TextView;
 
+import android.content.ContextWrapper;
+import java.io.File;
+import android.graphics.Bitmap;
+import android.widget.ImageView;
+import android.graphics.BitmapFactory;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import com.nwhacks.superteam.nfckiosk.imageHandler.imageViewHandler;
+
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mTextView;
 
-
+    private imageViewHandler imgViewHandler = new imageViewHandler();
 
 
 
@@ -115,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         //Checking for NFC compatability
         if (!mNfcAdapter.isEnabled()) {
             //Shit is good
-            Log.d("NFC Reader Doesnt Work"," :( ");
+            Log.d("NFC Reader Doesn't Work"," :( ");
 
         } else {
             //print("NFC is working on this device.");
@@ -217,6 +231,48 @@ public class MainActivity extends AppCompatActivity {
     No longer my code
      */
 
+
+
+
+    /*
+
+    SAVING IMAGE FILE TO FILE SYSTEM
+        -JEFF (AKA: big daddy)
+
+        This shit saves the bitmapImage to /data/data/NFCKioskAndroidApp/app_data/imageDir
+     */
+    private String saveToInternalStorage(Bitmap bitmapImage){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        // path to /data/data/NFCKioskAndroidApp/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File mypath=new File(directory,"profile.png");
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Write the image using Lossless compression
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
+    }
+
+    /*
+    Sets the image on screen to that of what is saved in the filesystem
+    */
+    public void setImageView(){
+
+        imgViewHandler.setImage();
+
+    }
 
 
 }
