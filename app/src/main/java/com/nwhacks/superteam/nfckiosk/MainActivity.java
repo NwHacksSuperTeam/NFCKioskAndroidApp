@@ -20,23 +20,37 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import android.os.Parcelable;
+import android.widget.Toast;
 
-import android.app.Activity;
+import android.nfc.NdefRecord;
+
+
 import android.app.PendingIntent;
-import android.content.IntentFilter.MalformedMimeTypeException;
 import android.widget.TextView;
-
-import com.nwhacks.superteam.nfckiosk.NFC.NdefReaderTask;
 
 
 public class MainActivity extends AppCompatActivity {
 
     Intent intent;
+
+    IntentFilter[] readTagFilters;
+    PendingIntent pendingIntent;
+    Tag detectedTag;
+
     NdefMessage[] msgs;
 
     //NFC Adaptor
     private NfcAdapter mNfcAdapter;
+
+
+
     private TextView mTextView;
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         mTextView = (TextView) findViewById(R.id.TextOutput);
+
 
         intent = new Intent(this, MainActivity.class);
         msgs = new NdefMessage[]{}; //initialize message array to be empty
@@ -95,12 +110,32 @@ public class MainActivity extends AppCompatActivity {
         //Checking for NFC compatability
         if (!mNfcAdapter.isEnabled()) {
             //Shit is good
+            Log.d("Good","Good");
+
         } else {
             //print("NFC is working on this device.");
+            Log.d("Bad","Sad");
         }
 
-        handleIntent(getIntent());
+        pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                new Intent(this,getClass()).
+                        addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
+        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+        IntentFilter filter2     = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        readTagFilters = new IntentFilter[]{tagDetected,filter2};
+
+    }
+
+    protected void onNewIntent(Intent intent) {
+
+        setIntent(intent);
+
+        if(getIntent().getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)){
+            detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+            readFromTag(getIntent());
+        }
     }
 
     @Override
@@ -129,103 +164,42 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        setupForegroundDispatch(this, mNfcAdapter);
-
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        setupForegroundDispatch(this, mNfcAdapter);
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+        mNfcAdapter.enableForegroundDispatch(this, pendingIntent, readTagFilters, null);
 
 
     }
 
 
-    /*
-    Makes sure the system lets this app actually handle an NFC instance.
-     */
-    public static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter) {
-        final Intent intent = new Intent(activity.getApplicationContext(), activity.getClass());
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        final PendingIntent pendingIntent = PendingIntent.getActivity(activity.getApplicationContext(), 0, intent, 0);
+    public void readFromTag(Intent intent){
 
-        IntentFilter[] filters = new IntentFilter[1];
-        String[][] techList = new String[][]{};
-
-        // Notice that this is the same filter as in our manifest.
-        filters[0] = new IntentFilter();
-        filters[0].addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        filters[0].addCategory(Intent.CATEGORY_DEFAULT);
-        try {
-            filters[0].addDataType("MIME_TEXT_PLAIN");
-        } catch (MalformedMimeTypeException e) {
-            throw new RuntimeException("Check your mime type.");
-        }
-
-        adapter.enableForegroundDispatch(activity, pendingIntent, filters, techList);
-    }
-    /*
-    Stops the shit I did in the function above
-     */
-    public static void stopForegroundDispatch(final Activity activity, NfcAdapter adapter) {
-        adapter.disableForegroundDispatch(activity);
-    }
+        Ndef ndef = Ndef.get(detectedTag);
 
 
+        try{
+            ndef.connect();
 
-    /*
-    Handles when the device incounters an NFC signal.
-     */
-    @Override
-    public void onNewIntent(Intent intent){
+            Parcelable[] messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
-        //TODO: Actually make this work.
-
-        //Do something with the output
-
-    }
-
-
-    public void handleIntent(Intent intent) {
-        String action = intent.getAction();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-
-            String type = intent.getType();
-            if ("MIME_TEXT_PLAIN".equals(type)) {
-
-                Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-                new NdefReaderTask().execute(tag);
-
-            } else {
-                Log.d("TAG", "Wrong mime type: " + type);
-            }
-        } else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)) {
-
-            // In case we would still use the Tech Discovered Intent
-            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            String[] techList = tag.getTechList();
-            String searchedTech = Ndef.class.getName();
-
-            for (String tech : techList) {
-                if (searchedTech.equals(tech)) {
-                    new NdefReaderTask().execute(tag);
-                    break;
+            if (messages != null) {
+                NdefMessage[] ndefMessages = new NdefMessage[messages.length];
+                for (int i = 0; i < messages.length; i++) {
+                    ndefMessages[i] = (NdefMessage) messages[i];
                 }
+                NdefRecord record = ndefMessages[0].getRecords()[0];
+
+                byte[] payload = record.getPayload();
+                String text = new String(payload);
+                mTextView.setText(text);
+
+
+                ndef.close();
+
             }
         }
-
-
-
+        catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Cannot Read From Tag.", Toast.LENGTH_LONG).show();
+        }
     }
 
 
