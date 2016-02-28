@@ -1,8 +1,12 @@
 package com.nwhacks.superteam.nfckiosk;
 
 import android.bluetooth.BluetoothSocket;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.ImageView;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,16 +40,26 @@ public class ConnectedThread extends Thread {
         byte[] buffer = new byte[100];  // buffer store for the stream
         int bytes; // bytes returned from read()
 
+        Bitmap bmp =  BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+        BufferedInputStream buf = new BufferedInputStream(mmInStream, 8096);
+
         // Keep listening to the InputStream until an exception occurs
-        for(int i =0;i<10;i++) {
-            try {
-                // Read from the InputStream
-                mmInStream.read(buffer);
-                // Send the obtained bytes to the UI activity
-                sleep(100);
-                Log.d("BLUETOOTH INPUT", "" + new String(buffer));
-            } catch (Exception e) {
-                break;
+        while (!(bmp != null)){
+            for (int i = 0; i < 1; i++) {
+                try {
+                    String request = "sendmeimage";
+                    byte[] requestBuffer = request.getBytes("UTF-8");
+                    //write(requestBuffer);
+
+                    buffer = new byte[buf.available()];
+                    buf.read(buffer);
+
+                    bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+                    String s = new String(buffer, 0, 40);
+                    Log.d("BLUETOOTH INPUT", "" + s);
+                } catch (Exception e) {
+                    break;
+                }
             }
         }
         try {mmInStream.close();}
@@ -55,7 +69,8 @@ public class ConnectedThread extends Thread {
     /* Call this from the main activity to send data to the remote device */
     public void write(byte[] bytes) {
         try {
-            mmOutStream.write(bytes);
+            for(int i = 0; i < 1000; i++)
+                mmOutStream.write(bytes);
         } catch (IOException e) { }
     }
 

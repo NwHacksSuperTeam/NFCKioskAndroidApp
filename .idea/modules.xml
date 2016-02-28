@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NFCKioskAndroidApp.iml" filepath="$PROJECT_DIR$/NFCKioskAndroidApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nfckioskandroidapp.iml" filepath="$PROJECT_DIR$/nfckioskandroidapp.iml" />
     </modules>
   </component>
 </project>
